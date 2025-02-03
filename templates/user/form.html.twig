@@ -1,0 +1,80 @@
+{% extends 'auth.html.twig' %}
+
+{% block title %}Usuário{% endblock %}
+
+{% block body %}
+
+<div>
+   <a href="/users"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        Voltar
+    </a>
+</div>
+
+<div class="space-y-6">
+    <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+        <div class="flex items-center p-6 sm:items-start lg:items-center">
+            <form action="{{ user and user.id ? path('app_user.update', { 'id': user.id }) : path('app_user.create') }}" method="post">
+
+                {% for message in app.flashes('error') %}
+                    <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {% for message in app.flashes('success') %}
+                    <div class="bg-green-100 text-green-700 p-3 rounded-lg mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+                <div class="grid gap-4 mb-6 grid-cols-1 md:grid-cols-2">
+                    <div>
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
+                        <input type="text" id="name" name="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        value="{{ user and user.name ? user.name : '' }}"
+                        required />
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Telefone</label>
+                        <input type="text" name="phone" id="phone"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            maxlength="15"
+                            placeholder="(99) 99999-9999"
+                            value="{{ user and user.phone ? user.phone : '' }}"
+                            required />
+                    </div>
+
+                    <div>
+                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
+                        <input type="password" name="password" id="password" placeholder="••••••••" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            {{ user and user.id ? null : 'required' }}/>
+                    </div>
+
+                    <div>
+                        <label for="roles" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Perfil</label>
+                        <select id="roles" name="roles" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option value="ROLE_USER" {{ user and 'ROLE_USER' in user.roles ? 'selected' : '' }}>Cliente</option>
+                            <option value="ROLE_ADMIN" {{ user and 'ROLE_ADMIN' in user.roles ? 'selected' : '' }}>Administrador</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                        <select id="status" name="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option value="1" {{ user and user.status == 1 ? 'selected' : '' }}>Ativo</option>
+                            <option value="0" {{ user and user.status == 0 ? 'selected' : '' }}>Inativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Salvar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

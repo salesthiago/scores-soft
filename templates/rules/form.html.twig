@@ -1,0 +1,58 @@
+{% extends 'auth.html.twig' %}
+
+{% block title %}Regras{% endblock %}
+
+{% block body %}
+
+<div>
+   <a href="/rules"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        Voltar
+    </a>
+
+</div>
+<div class="space-y-6">
+    <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+        <div class="flex items-center gap-8 p-6 sm:items-start lg:items-center">
+             <form action="{{ path(rule.id ? 'app_rules.update' : 'app_rules.create', rule.id ? { 'id': rule.id } : {}) }}" method="post">
+
+                {% if rule.id %}
+                    <input type="hidden" name="_method" value="PATCH">
+                {% endif %}
+
+                {% for message in app.flashes('error') %}
+                    <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                {% for message in app.flashes('success') %}
+                    <div class="bg-green-100 text-green-700 p-3 rounded-lg mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                <div class="grid gap-4 mb-6 grip-cols-1 md:grid-cols-2">
+                    <div>
+                        <label for="amount_min" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor Mínimo</label>
+                        <input type="text" id="amount_min" name="amount_min" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        value="{{ rule.amount_min }}"
+                        required />
+                    </div>
+                    <div>
+                        <label for="amount_max" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor Máximo</label>
+                        <input type="text" id="amount_max" name="amount_max" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        value="{{ rule.amount_max }}"
+                        required />
+                    </div>
+                    <div>
+                        <label for="score" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ponto(s)</label>
+                        <input type="text" id="score" name="score" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        value="{{ rule.score }}"
+                        required />
+                    </div>
+                </div>
+                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Salvar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -48,7 +48,7 @@ class PhoneAuthenticator extends AbstractAuthenticator
             new UserBadge($phone, function($userIdentifier) {
                 $user = $this->entityManager
                     ->getRepository(User::class)
-                    ->findOneBy(['phone' => $userIdentifier]);
+                    ->findOneBy(['phone' => str_replace(['(', ')', '-', ' '], '', $userIdentifier)]);
 
                 if (!$user) {
                     throw new CustomUserMessageAuthenticationException('Usuário não encontrado');

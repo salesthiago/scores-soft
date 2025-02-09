@@ -72,4 +72,14 @@ final class RulesController extends AbstractController
             'rule' => $rule->toArray()
         ]);
     }
+    #[Route('/rules/destroy/{id}', name: 'app_rules.destroy', methods: ['delete'])]
+    public function destroy(#[MapEntity(id: 'id')] Rule $rule, Request $request): Response
+    {
+
+        $this->entity->remove($rule);
+        $this->entity->flush();
+        
+        $this->addFlash('success', 'Deletetado com sucesso!');
+        return $this->redirectToRoute('app_rules');
+    }
 }

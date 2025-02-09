@@ -1,0 +1,31 @@
+{% extends 'auth.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+
+
+<div class="space-y-6">
+    <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+        <div class="flex w-full items-center gap-8 p-6 sm:items-start lg:items-center">
+            <section class="bg-white dark:bg-gray-900">
+                <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
+                    <div class="max-w-screen-md mb-8 lg:mb-16">
+                        <p class="text-center text-gray-500 sm:text-xl dark:text-gray-400">Meus Pontos</p>
+                        <h2 class=" text-center mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">{{ scores.points }}</h2>
+                    </div>
+                </div>
+            </section>
+            <section class="bg-white dark:bg-gray-900">
+                <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
+                    <div class="max-w-screen-md mb-8 lg:mb-16">
+                        <p class="text-center text-gray-500 sm:text-xl dark:text-gray-400"> Acumulado</p>
+                        <h2 class="text-center mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">{{ scores.remaining_value }}</h2>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

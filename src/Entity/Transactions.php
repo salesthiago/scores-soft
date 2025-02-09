@@ -13,28 +13,48 @@ class Transactions
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $user_id = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: true)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "created_by", referencedColumnName: "id", nullable: true)]
+    private ?User $creator = null;
 
     #[ORM\Column]
     private ?float $amount = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $order_number = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $created_at = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(int $user_id): static
+    public function setUser(?User $user): static
     {
-        $this->user_id = $user_id;
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->creator;
+    }
+
+    public function setCreator(?User $creator): static
+    {
+        $this->creator = $creator;
 
         return $this;
     }
@@ -61,5 +81,37 @@ class Transactions
         $this->order_number = $order_number;
 
         return $this;
+    }
+    
+    public function setCreatedAt(): static
+    {
+        $this->created_at = date('Y-m-d H:i:s');
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?string
+    {
+        return $this->created_at;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'user' => $this->user ? [
+                'id' => $this->user->getId(),
+                'name' => $this->user->getName(),
+                'phone' => $this->user->getPhone()
+            ] : null,
+            'creator' => $this->creator ? [
+                'id' => $this->creator->getId(),
+                'name' => $this->creator->getName(),
+                'phone' => $this->user->getPhone()
+            ] : null,
+            'amount' => $this->amount,
+            'order_number' => $this->order_number,
+            'created_at' => date_format(date_create($this->created_at), 'd/m/Y H:i:s')
+        ];
     }
 }

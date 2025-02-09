@@ -1,0 +1,40 @@
+{% extends 'auth.html.twig' %}
+
+{% block title %}Premios!{% endblock %}
+
+{% block body %}
+
+
+<div class="space-y-6">
+    <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+        <div class="flex w-full items-center gap-8 p-6 sm:items-start lg:items-center">
+        <section class="bg-white dark:bg-gray-900">
+  <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6 ">
+      <div class="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
+          <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Prêmios Disponíveis</h2>
+          <p class="font-light text-gray-500 lg:mb-16 sm:text-xl dark:text-gray-400">Atinja a pontuação para solilcitar seus prêmios. Depois de atingir a puntuação necessária basta clicar em Solicitar.</p>
+      </div>
+      <div class="grid gap-8 mb-6 lg:mb-16 md:grid-cols-2">
+        {% for item in rewards %}
+          <div class="items-center bg-gray-50 rounded-lg shadow sm:flex dark:bg-gray-800 dark:border-gray-700">
+              <a href="#">
+                  <img class="w-full rounded-lg sm:rounded-none sm:rounded-l-lg" src="{{ item.image }}" alt="{{ item.name }}">
+              </a>
+              <div class="p-4">
+                  <h3 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                      <a href="#" class="">{{ item.name }}</a>
+                  </h3>
+                  <span class="text-gray-500 dark:text-gray-400"><b>{{ item.pointsCost }}</b> Pontos</span>
+                  <p class="p-4 mt-3 mb-4 font-light text-gray-500 dark:text-gray-400">{{ item.description }}</p>
+                  
+              </div>
+          </div> 
+      </div>  
+  </div>
+</section>
+        {% endfor %}
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

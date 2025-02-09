@@ -13,14 +13,27 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class AuthController extends AbstractController
 {
+    private $entity;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entity = $entityManager;
+    }
+
     #[Route('/login', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response {
+        $user = $this->getUser();
+        if ($user) {
+           return $this->redirectToRoute('app_home');
+        }
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        if ($error) {
+            $this->addFlash('error', $error->getMessage());
+        }
         return $this->render('auth/login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
+            'last_username' => $lastUsername
         ]);
     }
 
@@ -37,13 +50,18 @@ final class AuthController extends AbstractController
             $confirmPassword = $request->request->get('confirm-password');
 
             if (empty($password) || empty($confirmPassword)) {
-                return $this->redirectToRoute('app_auth.register', ['error' => 'Informe e confirme a senha']);
+                return $this->redirectToRoute('app_register', ['error' => 'Informe e confirme a senha']);
             }
 
             if ($password !== $confirmPassword) {
-                return $this->redirectToRoute('app_auth.register', ['error' => 'As senhas não conferem']);
+                $this->addFlash('error', 'As senhas não conferem');
+                return $this->redirectToRoute('app_register');
             }
 
+            if (!$this->validatePhone($phone)) {
+                $this->addFlash('error', 'Este número já está cadastrado.');
+                return $this->redirectToRoute('app_register');
+            }
             $user = new User();
             $user->setName($name);
             $user->setPhone($phone);
@@ -62,5 +80,14 @@ final class AuthController extends AbstractController
     public function logout(): void
     {
         // será interceptado pelo firewall
+    }
+
+    private function validatePhone($phone)
+    {
+        $user = $this->entity->getRepository(User::class)->findOneBy(['phone' => $phone]);
+        if ($user) {
+            return false;
+        }
+        return true;
     }
 }

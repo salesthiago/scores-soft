@@ -10,14 +10,85 @@ class Reward
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    private string $name;
+    
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $image;
 
-    #[ORM\Column(type: 'text')]
-    private $description;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description;
+    
+    #[ORM\Column(type: 'string')]
+    private string $status;
 
     #[ORM\Column(type: 'integer')]
-    private $pointsCost;
+    private int $pointsCost;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+    public function setName(string $value): void
+    {
+        $this->name = $value;
+    }
+
+    public function setImage(string $value): void
+    {
+        $this->image = $value;
+    }
+
+    public function setDescription(string $value): void
+    {
+        $this->description = $value;
+    }
+
+    public function setPointsCost(string $value): void
+    {
+        $this->pointsCost = $value;
+    }
+
+    public function setStatus(string $value): void
+    {
+        $this->status = $value;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getPointsCost(): string
+    {
+        return $this->pointsCost;
+    }
+    
+    public function getImage(): string
+    {
+        return $this->image;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'status' => $this->status,
+            'name' => $this->name,
+            'description' => $this->description,
+            'pointsCost' => $this->pointsCost,
+            'image' => '/uploads/'.$this->image
+        ];
+    }
 }

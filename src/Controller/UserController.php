@@ -32,9 +32,7 @@ final class UserController extends AbstractController
     public function searchByPhone($phone): Response
     {
         $user = $this->entity->getRepository(User::class)->findOneBy(['phone' => $phone]);
-        return $this->render('user/index.html.twig', [
-            'user' => $user,
-        ]);
+        return $this->json($user ? $user->toArray() : null);
     }
     #[Route('/user/create', name: 'app_user.create')]
     public function create(UserPasswordHasherInterface $passwordHash, Request $request): Response
@@ -65,7 +63,7 @@ final class UserController extends AbstractController
             'user' => $user
         ]);
     }
-    #[Route('/user/{id}', name: 'app_user.update')]
+    #[Route('/user/{id}/update', name: 'app_user.update')]
     public function update(
         #[MapEntity(id: 'id')] User $user,
         UserPasswordHasherInterface $passwordHash,

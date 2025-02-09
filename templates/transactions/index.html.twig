@@ -1,20 +1,94 @@
-{% extends 'base.html.twig' %}
+{% extends 'auth.html.twig' %}
 
-{% block title %}Hello TransactionsController!{% endblock %}
+{% block title %}Registros{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mx-auto px-4 py-6">
+    <div class="mb-6">
+        <a href="/transactions/new" type="button"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+            Novo Registro
+        </a>
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {% for message in app.flashes('success') %}
+        <div class="bg-green-100 text-green-700 p-3 rounded-lg mx-4">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <div class="space-y-6">
+        <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+            <!-- Cabeçalho da tabela -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4">
+                <div class="grid grid-cols-4 gap-1">
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Valor</div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Usuário</div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Data Lancamento</div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">#</div>
+                </div>
+            </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/Users/thiagosales/primodev/scores-soft/src/Controller/TransactionsController.php</code></li>
-        <li>Your template at <code>/Users/thiagosales/primodev/scores-soft/templates/transactions/index.html.twig</code></li>
-    </ul>
+            <!-- Conteúdo da tabela -->
+            {% if transactions is empty %}
+                <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                    Nenhum registro encontrado.
+                </div>
+            {% else %}
+            
+                {% for item in transactions %}
+                    <div class="flex flex-row items-center gap-8 p-6 sm:items-start lg:items-center">
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            {{ item.amount }}
+                        </div>
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            {{ item.user.name }}
+                        </div>
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            {{ item.created_at }}
+                        </div>
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            <button type="button" id="btn-delete-{{ item.id }}" class="font-medium text-red-600 dark:text-red-500 hover:underline" onClick="destroy({{ item.id }})">
+                                Deletar
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
 </div>
+<script>
+function destroy(id) {
+    fetch(`/transaction/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na requisição');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.id) {
+            userIdField.value = data.id;
+            feedback.textContent = data.name;
+            feedback.classList.remove('text-red-600');
+            feedback.classList.add('text-green-600');
+            phoneInput.classList.add('border-green-500');
+        } else {
+            throw new Error('Usuário não encontrado');
+        }
+    })
+    .catch(error => {
+        feedback.textContent = "Usuário não encontrado. Verifique o número e tente novamente.";
+        feedback.classList.remove('text-blue-600');
+        feedback.classList.add('text-red-600');
+        phoneInput.classList.add('border-red-500');
+        userIdField.value = '';
+    });
+}
+</script>
 {% endblock %}

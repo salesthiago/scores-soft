@@ -1,90 +1,161 @@
 {% extends 'auth.html.twig' %}
 
-{% block title %}Regras{% endblock %}
+{% block title %}Registro{% endblock %}
 
 {% block body %}
+<div class="container mx-auto px-4 py-6">
+    <div class="mb-6">
+        <a href="{{ path('app_transactions') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+            Voltar
+        </a>
+    </div>
 
-<div>
-   <a href="/rules"
-    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-        Voltar
-    </a>
-
-</div>
-<div class="space-y-6">
-    <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
-        <div class="flex items-center gap-8 p-6 sm:items-start lg:items-center">
-             <form action="{{ path('app_transactions.create') }}" method="post">
-
-                {% for message in app.flashes('error') %}
-                    <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-                {% for message in app.flashes('success') %}
-                    <div class="bg-green-100 text-green-700 p-3 rounded-lg mb-4">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-                <div class="grid gap-4 mb-6 grip-cols-1 md:grid-cols-2">
-                    <div>
-                        <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor</label>
-                        <input type="text" id="amount" name="amount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required />
-                    </div>
-                    <div>
-                        <label for="user_phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Telefone do Cliente</label>
-                        <input type="text" id="user_phone" name="user_phone"
-                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                               placeholder="Digite o telefone do cliente"
-                               required />
-                        <small id="user_feedback" class="text-red-500 hidden">Usuário não encontrado.</small>
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-6">
+                <form action="{{ path('app_transactions.create') }}" method="post" class="space-y-6">
+                    {% for message in app.flashes('error') %}
+                        <div class="bg-red-100 text-red-700 p-3 rounded-lg my-4">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                    
+                    {# Campo de busca de usuário #}
+                    <div class="space-y-2">
+                        <label for="user_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Telefone do Cliente
+                        </label>
+                        <div class="relative">
+                            <input type="text" 
+                                   id="user_phone" 
+                                   name="user_phone"
+                                   class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                   placeholder="(00) 00000-0000"
+                                   required />
+                            <button type="button"
+                                    onclick="searchUser()"
+                                    class=" m-2 p-2 absolute right-2 top-1/2 -translate-y-1/2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700">
+                                Buscar
+                            </button>
+                        </div>
+                        <div id="user_feedback" class="hidden text-sm text-red-600 dark:text-red-400"></div>
                     </div>
 
                     <input type="hidden" id="user_id" name="user_id">
-                    <div>
-                        <label for="order_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">N. Pedido</label>
-                        <input type="text" id="order_number" name="order_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        required />
+
+                    {# Campos de valor e número do pedido #}
+                    <div id="content" style="display: none" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Valor
+                            </label>
+                            <input type="text"
+                                   id="amount"
+                                   name="amount"
+                                   class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                   required />
+                        </div>
+                        
+                        <div>
+                            <label for="order_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                N. Pedido
+                            </label>
+                            <input type="text"
+                                   id="order_number"
+                                   name="order_number"
+                                   class="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                   required />
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" 
+                                    class="w-full md:w-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700">
+                                Salvar
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Salvar</button>
-            </form>
+
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-document.getElementById('user_phone').addEventListener('blur', function() {
-    let phone = this.value.trim();
-    let feedback = document.getElementById('user_feedback');
-    let userIdField = document.getElementById('user_id');
+function searchUser() {
+    const phone = document.getElementById('user_phone').value.replace(/\D/g, '');
+    const feedback = document.getElementById('user_feedback');
+    const userIdField = document.getElementById('user_id');
+    const phoneInput = document.getElementById('user_phone');
+    const content = document.getElementById('content');
 
-    if (phone.length < 10) {
-        feedback.textContent = "Número de telefone inválido.";
+    // Limpa estados anteriores
+    feedback.classList.add('hidden');
+    phoneInput.classList.remove('border-red-500');
+
+    // Validação básica do telefone (remove caracteres não numéricos para checar)
+    const phoneNumbers = phone.replace(/\D/g, '');
+    if (phoneNumbers.length < 10) {
+        feedback.textContent = "Número de telefone inválido. Digite no formato (00) 00000-0000";
         feedback.classList.remove('hidden');
+        phoneInput.classList.add('border-red-500');
         userIdField.value = '';
         return;
     }
 
-    fetch('/search-user-by-phone/' + encodeURIComponent(phone))
-        .then(response => response.json())
-        .then(data => {
-            if (data.id) {
-                userIdField.value = data.id;
-                feedback.classList.add('hidden');
-            } else {
-                feedback.textContent = "Usuário não encontrado.";
-                feedback.classList.remove('hidden');
-                userIdField.value = '';
-            }
-        })
-        .catch(error => {
-            feedback.textContent = "Erro ao buscar usuário.";
-            feedback.classList.remove('hidden');
-            userIdField.value = '';
-            console.error('Erro:', error);
-        });
+    // Mostra estado de carregamento
+    feedback.textContent = "Buscando usuário...";
+    feedback.classList.remove('hidden');
+    feedback.classList.remove('text-red-600');
+    feedback.classList.add('text-blue-600');
+
+    fetch(`/search-user-by-phone/${encodeURIComponent(phone)}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na requisição');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.id) {
+            userIdField.value = data.id;
+            feedback.textContent = data.name;
+            content.style.display = 'grid'
+            feedback.classList.remove('text-red-600');
+            feedback.classList.add('text-green-600');
+            phoneInput.classList.add('border-green-500');
+        } else {
+            throw new Error('Usuário não encontrado');
+        }
+    })
+    .catch(error => {
+        feedback.textContent = "Usuário não encontrado. Verifique o número e tente novamente.";
+        feedback.classList.remove('text-blue-600');
+        feedback.classList.add('text-red-600');
+        phoneInput.classList.add('border-red-500');
+        userIdField.value = '';
+    });
+}
+
+// Adiciona máscara ao telefone
+document.getElementById('user_phone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+        value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+        e.target.value = value;
+    }
+});
+
+// Adiciona máscara de moeda ao campo valor
+document.getElementById('amount').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    value = (Number(value) / 100).toFixed(2);
+    e.target.value = value.replace('.', ',');
 });
 </script>
 {% endblock %}

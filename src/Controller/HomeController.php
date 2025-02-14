@@ -12,6 +12,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\ScoringService;
+use Exception;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -25,11 +27,10 @@ final class HomeController extends AbstractController
     #[Route('/home', name: 'app_home')]
     public function index(AuthorizationCheckerInterface $authChecker): Response
     {
-        
-        /*
-        if (!$authChecker->isGranted('ROLE_USER')) {
+        $user = $this->getUser();
+        if (!$user) {
             return $this->redirectToRoute('app_login');
-        }*/
+        }
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
         ]);
@@ -48,6 +49,9 @@ final class HomeController extends AbstractController
     public function history(ScoringService $scoringService): Response
     {
         $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
         $history = $scoringService->getHistory($user);
 
         return $this->render('home/my-history.html.twig', [
@@ -58,7 +62,10 @@ final class HomeController extends AbstractController
     #[Route('/rewards', name: 'app_rewards')]
     public function rewards(EntityManagerInterface $entityManager): Response
     {
-        
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
         $items = $entityManager->getRepository(Reward::class)->findBy(['status' => 'enabled']);
         $rewards = [];
         foreach($items as $item) {
@@ -104,5 +111,20 @@ final class HomeController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', 'Dados do usuário atualizados com sucesso!!');
         return $this->redirectToRoute('app_home');
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(Security $security)
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+        try {
+            $security->logout();
+            $this->redirectToRoute('app_login');
+        } catch(Exception $e) {
+            echo $e->getMessage();
+        }
     }
 }

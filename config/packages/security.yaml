@@ -17,6 +17,9 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\PhoneAuthenticator
+            form_login:
+                login_path: app_login
+                check_path: app_login
             logout:
                 path: app_logout
                 target: app_login
@@ -28,3 +31,5 @@ security:
         - { path: ^/transactions, roles: ROLE_ADMIN }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/home, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/logout, roles: IS_AUTHENTICATED_FULLY }

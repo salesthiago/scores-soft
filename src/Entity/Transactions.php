@@ -29,6 +29,9 @@ class Transactions
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $created_at = null;
+    
+    #[ORM\Column()]
+    private bool $is_consumed = false;
 
     public function getId(): ?int
     {
@@ -93,6 +96,16 @@ class Transactions
     public function getCreatedAt(): ?string
     {
         return $this->created_at;
+    }
+
+    public function getIsConsumed(): bool
+    {
+        return $this->is_consumed;
+    }
+
+    public function setIsConsumed(bool $value): void
+    {
+        $this->is_consumed = $value;
     }
 
     public function toArray(): array

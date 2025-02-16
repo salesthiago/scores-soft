@@ -73,8 +73,8 @@ final class TransactionsController extends AbstractController
                 $transaction->setCreatedAt(date('Y-m-d H:i:s'));
                 
                 $transaction->setAmount($data['amount']);
-                if (!empty($data['number_amount'])) {
-                    $transaction->setOrderNumber($data['number_amount']);
+                if (!empty($data['order_number'])) {
+                    $transaction->setOrderNumber($data['order_number']);
                 }
                 $this->entity->persist($transaction);
                 $this->entity->flush();

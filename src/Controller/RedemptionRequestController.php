@@ -25,8 +25,14 @@ final class RedemptionRequestController extends AbstractController
     #[Route('/redemption/request', name: 'app_redemption_request')]
     public function index(Request $request): Response
     {
+        $user = $this->getUser();
+        $filter =  ['status' => $request->query->get('status', 'pending')];
+        // SE NAO FOR ADMIN, FILTRA PELO USUARIO PARA VER SOMENTE AS SUAS REQUISIÇÕES.
+        if (array_search('ROLE_USER', $user->getRoles(), true)) {
+            $filter['user_id'] = $user->getId();
+        }
         $redemptions = $this->entity->getRepository(RedemptionRequest::class)
-            ->findBy(['status' => $request->query->get('status', 'pending')]);
+            ->findBy($filter);
         $items = [];
 
         foreach ($redemptions as $item) {
@@ -82,15 +88,14 @@ final class RedemptionRequestController extends AbstractController
                 return $this->redirectToRoute('app_redemption_request.create');
             }
             $status = '';
-            $redemption->setStatus($data['status']);
-            $this->entity->persist($redemption);
-            $this->entity->flush();
+            
             switch ($data['status']) {
                 case 'pending':
                     $status = 'Pendente';
                 break;
                 case 'approved':
                     $status = 'Aprovado';
+                    $redemption->setStatus($data['status']);
                     break;
                 case 'rejected':
                     $status = 'Rejeitado';
@@ -99,6 +104,9 @@ final class RedemptionRequestController extends AbstractController
                     $status = $data['status'];
                 break;
             }
+            $this->entity->persist($redemption);
+            $this->entity->flush();
+
             $this->addFlash('success', 'Requisição atualizada para '. $status);
             return $this->redirectToRoute('app_redemption_request');
         }

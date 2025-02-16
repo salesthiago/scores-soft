@@ -102,7 +102,7 @@ final class RewardController extends AbstractController
         return $this->render('reward/form.html.twig', ['reward' => $reward->toArray()]);
     }
 
-    #[Route('/admin/reward/{id}', name: 'app_admin_reward.delete', methods: ['delete'])]
+    #[Route('/admin/reward/{id}', name: 'app_admin_reward.destroy', methods: ['delete'])]
     public function destroy(#[MapEntity(id: 'id')] Reward $reward)
     {
         $this->entity->remove($reward);

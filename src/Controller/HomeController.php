@@ -16,6 +16,7 @@ use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 final class HomeController extends AbstractController
 {
@@ -58,7 +59,7 @@ final class HomeController extends AbstractController
             'history' => $history,
         ]);
     }
-    
+
     #[Route('/rewards', name: 'app_rewards')]
     public function rewards(EntityManagerInterface $entityManager): Response
     {
@@ -69,7 +70,9 @@ final class HomeController extends AbstractController
         $items = $entityManager->getRepository(Reward::class)->findBy(['status' => 'enabled']);
         $rewards = [];
         foreach($items as $item) {
-            $rewards[] = $item->toArray();
+            $a = $item->toArray();
+            $a['description'] = substr($a['description'], 0, 20) .' ...';
+            $rewards[] = $a;
         }
 
         return $this->render('home/rewards.html.twig', [
@@ -77,7 +80,18 @@ final class HomeController extends AbstractController
         ]);
     }
     
-    #[Route('/profile', name: 'app_profile')]
+    #[Route('/reward/{id}', name: 'app_show_reward')]
+    public function requestReward(#[MapEntity(id: 'id')] Reward $reward, ScoringService $scoringService): Response
+    {
+        $user = $this->getUser();
+        $balance = $scoringService->getUserBalance($user);
+        return $this->render('home/request.html.twig', [
+            'reward' => $reward->toArray(),
+            'balance' => $balance
+        ]);
+    }
+
+    #[Route('/profile', name: 'app_profile', methods: ['POST'])]
     public function profile(
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordEncoder,
@@ -100,7 +114,7 @@ final class HomeController extends AbstractController
             }
         }
         $userLogged = $this->getUser();
-        $user = $entityManager->getRepository(User::class)->find($userLogged->id);
+        $user = $entityManager->getRepository(User::class)->find($userLogged->getId());
         $user->setName($data['name']);
         if (!empty($data['password']) && !empty($data['confirmPassword'])) {
             if (!empty($data['password'])) {

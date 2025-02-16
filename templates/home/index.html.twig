@@ -9,8 +9,9 @@
     <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
             <h2 class="m-5 p-4 text-white">Bem vindo {{ app.user.name }}</h2>
         <div class="flex items-center gap-8 p-6 sm:items-start lg:items-center">
-            
-             <form class="w-full" action="{{ path('app_profile') }})" method="post" enctype="multipart/form-data">
+
+            <form class="w-full" action="{{ path('app_profile') }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="_token" value="{{ csrf_token('profile-form') }}">
                 {% for message in app.flashes('error') %}
                     <div class="bg-red-100 text-red-700 p-3 rounded-lg m-4">
                         {{ message }}
@@ -33,6 +34,7 @@
                         <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Telefone</label>
                         <input id="phone"
                             name="phone"
+                            value="{{ app.user.phone }}"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             disabled
                             required />
@@ -79,7 +81,7 @@
         } else {
             phone = phone.replace(/^(\d{0,2})$/, "($1");
         }
-        phoneInput.value = phone 
+        phoneInput.value = phone
     });
 </script>
 {% endblock %}

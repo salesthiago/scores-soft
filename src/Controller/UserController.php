@@ -34,7 +34,7 @@ final class UserController extends AbstractController
         $user = $this->entity->getRepository(User::class)->findOneBy(['phone' => $phone]);
         return $this->json($user ? $user->toArray() : null);
     }
-    #[Route('/user/create', name: 'app_user.create')]
+    #[Route('/users/create', name: 'app_user.create')]
     public function create(UserPasswordHasherInterface $passwordHash, Request $request): Response
     {
         $user = [
@@ -42,6 +42,7 @@ final class UserController extends AbstractController
             'name' => '',
             'phone' => '',
             'password' => '',
+            'status' => '1',
             'roles' => 'ROLE_USER'
         ];
         if ($request->isMethod("post")) {

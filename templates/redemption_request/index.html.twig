@@ -1,0 +1,69 @@
+{% extends 'auth.html.twig' %}
+
+{% block title %}Solicitações de Prêmios{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-6">
+    
+    {% for message in app.flashes('error') %}
+        <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('success') %}
+        <div class="bg-green-100 text-green-700 p-3 rounded-lg mb-4">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <div class="space-y-6">
+        <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
+            <!-- Cabeçalho da tabela -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4">
+                <div class="grid grid-cols-4 gap-1">
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Recompensa</div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Status</div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Data</div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">#</div>
+                </div>
+            </div>
+
+            <!-- Conteúdo da tabela -->
+            {% if items is empty %}
+                <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                    Nenhuma registro encontrado. 
+                </div>
+            {% else %}
+                {% for item in items %}
+                    <div class="flex flex-row items-center gap-8 p-6 sm:items-start lg:items-center">
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            {{ item.reward.name }}
+                        </div>
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            {{ item.status }}
+                        </div>
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            {{ item.requestDate }}
+                        </div>
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            <form action="{{ path('app_redemption_request.destroy', {'id': item.id }) }}" method="delete" onsubmit="return confirmDelete(this)">
+                                <button type="submit" class="font-medium text-red-600 dark:text-red-500 hover:underline">
+                                    Deletar
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+   function confirmDelete(form) {
+    console.log('confirmDelete...', form);
+        if (confirm("Realmente deseja cancelar esta solicitação?")) {
+            return true;
+        }
+        return false;
+    }
+</script>
+{% endblock %}

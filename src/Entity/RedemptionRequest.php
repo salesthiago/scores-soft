@@ -23,9 +23,15 @@ class RedemptionRequest
 
     #[ORM\Column(type: 'datetime')]
     private DateTime $requestDate;
+    
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?DateTime $processedDate;
 
     #[ORM\Column(type: 'string', length: 20)]
     private string $status; // 'pending', 'approved', 'rejected'
+
+    #[ORM\Column(type: 'integer')]
+    private int $pointsCost;
 
     public function getId(): int
     {
@@ -57,6 +63,16 @@ class RedemptionRequest
         $this->status = $string;
     }
 
+    public function setPointsCost(string $value): void
+    {
+        $this->pointsCost = $value;
+    }
+
+    public function getPointsCost(): int
+    {
+        return $this->pointsCost;
+    }
+
     public function setRequestDate(DateTime $date): void
     {
         $this->requestDate = $date;
@@ -72,6 +88,16 @@ class RedemptionRequest
         $this->reward = $reward;
     }
 
+    public function setProcessedDate(DateTime $date): void
+    {
+        $this->processedDate = $date;
+    }
+
+    public function getProcessedDate(): DateTime
+    {
+        return $this->processedDate;
+    }
+
     public function toArray(): array
     {
         return [
@@ -79,7 +105,9 @@ class RedemptionRequest
             'status' => $this->getStatus(),
             'user' => $this->user->toArray(),
             'reward' => $this->reward->toArray(),
-            'requestDate' =>  $this->requestDate->format('d/m/Y H:i:s')
+            'requestDate' =>  $this->requestDate->format('d/m/Y H:i:s'),
+            'pointsCost' => $this->pointsCost,
+            'processedDate' => $this->processedDate ? $this->processedDate->format('d/m/Y H:i:s') : null
         ];
     }
 }

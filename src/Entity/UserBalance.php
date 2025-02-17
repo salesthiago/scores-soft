@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 #[ORM\Entity]
 class UserBalance
@@ -21,6 +22,9 @@ class UserBalance
 
     #[ORM\Column]
     private int $points = 0;
+
+    #[ORM\Column]
+    private int $reservedPoints = 0;
 
     public function getId(): ?int
     {
@@ -66,10 +70,69 @@ class UserBalance
         return $this;
     }
 
+    public function getReservedPoints(): int
+    {
+        return $this->reservedPoints;
+    }
+
+    public function getAvailablePoints(): int
+    {
+        return $this->points - $this->reservedPoints;
+    }
+
+    public function reservePoints(int $points): self
+    {
+        if ($this->getAvailablePoints() < $points) {
+            throw new InsufficientPointsException(
+                'Saldo insuficiente para reserva. Disponível: ' . 
+                $this->getAvailablePoints() . 
+                ', Solicitado: ' . $points
+            );
+        }
+        
+        $this->reservedPoints += $points;
+        return $this;
+    }
+
+    public function unreservePoints(int $points): self
+    {
+        if ($this->reservedPoints < $points) {
+            throw new \InvalidArgumentException(
+                'Tentativa de liberar mais pontos do que está reservado'
+            );
+        }
+        
+        $this->reservedPoints -= $points;
+        return $this;
+    }
+
+    public function deductPoints(int $points): self
+    {
+        if ($this->points < $points) {
+            throw new Exception(
+                'Saldo insuficiente para dedução. Atual: ' . 
+                $this->points . 
+                ', Solicitado: ' . $points
+            );
+        }
+        
+        if ($this->reservedPoints < $points) {
+            throw new \InvalidArgumentException(
+                'Tentativa de deduzir pontos não reservados'
+            );
+        }
+        
+        $this->points -= $points;
+        $this->reservedPoints -= $points;
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
             'points' => $this->getPoints(),
+            'reserved_points' => $this->getReservedPoints(),
+            'available_points' => $this->getAvailablePoints(),
             'remaining_value' => $this->getRemainingValue()
         ];
     }

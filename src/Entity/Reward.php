@@ -80,6 +80,14 @@ class Reward
         return $this->image;
     }
 
+    public function isActive(): bool
+    {
+        if ($this->status === 'enabled') {
+            return true;
+        }
+        return false;
+    }
+
     public function toArray(): array
     {
         return [

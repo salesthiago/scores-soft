@@ -35,7 +35,11 @@ Siga os passos abaixo para configurar o ambiente e rodar o projeto:
    ```bash
    php bin/console doctrine:migrations:migrate
    ```
-5. Inicie o servidor de desenvolvimento:
+5. Crie as tabelas do banco
+   ```bash
+   php bin/console doctrine:migrations:migrate
+   ```
+6. Inicie o servidor de desenvolvimento:
    ```bash
    symfony server:start
    ```

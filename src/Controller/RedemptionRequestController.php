@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\RedemptionRequest;
 use App\Entity\Reward;
+use App\Service\RedemptionService;
 use App\Service\ScoringService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +46,7 @@ final class RedemptionRequestController extends AbstractController
     }
 
     #[Route('/redemption/request/create', name: 'app_redemption_request.create')]
-    public function create(ScoringService $scoringService, Request $request): Response
+    public function create(RedemptionService $redemptionService, Request $request): Response
     {
         if ($request->isMethod('POST')) {
             $user = $this->getUser();
@@ -54,7 +56,7 @@ final class RedemptionRequestController extends AbstractController
                 $this->addFlash('error', 'Recompensa não encontrada');
                 return $this->redirectToRoute('app_redemption_request.create');
             }
-            $balanceUser = $scoringService->getUserBalance($user)->toArray();
+            /*$balanceUser = $scoringService->getUserBalance($user)->toArray();
             $points = $balanceUser['points'];
             $minimalPoints = $rewardFounded->getPointsCost();
 
@@ -70,15 +72,26 @@ final class RedemptionRequestController extends AbstractController
 
             $this->entity->persist($redemption);
             $this->entity->flush();
+            */
+            try {
 
-            $this->addFlash('success', 'Requisição solicitada com sucesso');
-            return $this->redirectToRoute('app_redemption_request');
+                $redemptionService->createRedemptionRequest($user, $rewardFounded);
+                $this->addFlash('success', 'Requisição solicitada com sucesso');
+                return $this->redirectToRoute('app_redemption_request');
+            } catch (Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->render('redemption_request/form.html.twig');
+            }
         }
         return $this->render('redemption_request/form.html.twig');
     }
 
     #[Route('/redemption/request/update/{id}', name: 'app_redemption_request.update')]
-    public function update(#[MapEntity(id: 'id')] RedemptionRequest $redemption, Request $request): Response
+    public function update(
+        #[MapEntity(id: 'id')] RedemptionRequest $redemption,
+        RedemptionService $redemptionService,
+        Request $request
+    ): Response
     {
         if ($request->isMethod('POST')) {
             $data = $request->getPayload()->all();
@@ -95,7 +108,8 @@ final class RedemptionRequestController extends AbstractController
                 break;
                 case 'approved':
                     $status = 'Aprovado';
-                    $redemption->setStatus($data['status']);
+                    //$redemption->setStatus($data['status']);
+                    $redemptionService->processRedemptionRequest($redemption, $data['status']);
                     break;
                 case 'rejected':
                     $status = 'Rejeitado';
@@ -104,8 +118,8 @@ final class RedemptionRequestController extends AbstractController
                     $status = $data['status'];
                 break;
             }
-            $this->entity->persist($redemption);
-            $this->entity->flush();
+            // $this->entity->persist($redemption);
+            // $this->entity->flush();
 
             $this->addFlash('success', 'Requisição atualizada para '. $status);
             return $this->redirectToRoute('app_redemption_request');

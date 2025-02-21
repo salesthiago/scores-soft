@@ -100,9 +100,24 @@ class RedemptionRequest
 
     public function toArray(): array
     {
+        $status = '';
+        switch($this->status) {
+            case 'pending':
+                $status = 'Aguardando Liberação';
+                break;
+            case 'approved':
+                $status = 'Aprovado';
+                break;
+            case 'rejected':
+                $status = 'Negado';
+                break;
+            default:
+                $status = $this->status;
+                break;
+        }
         return [
             'id' => $this->getId(),
-            'status' => $this->getStatus(),
+            'status' => $status,
             'user' => $this->user->toArray(),
             'reward' => $this->reward->toArray(),
             'requestDate' =>  $this->requestDate->format('d/m/Y H:i:s'),

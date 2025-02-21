@@ -32,19 +32,19 @@
                 {% endfor %}
                 <div class="grid gap-4 mb-6 grip-cols-1 md:grid-cols-2">
                     <div>
-                        <label for="amount_min" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor Mínimo</label>
+                        <label for="amount_min" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quantidade Mínimo</label>
                         <input type="text" id="amount_min" name="amount_min" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         value="{{ rule.amount_min }}"
                         required />
                     </div>
                     <div>
-                        <label for="amount_max" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Valor Máximo</label>
+                        <label for="amount_max" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quantidade Máximo</label>
                         <input type="text" id="amount_max" name="amount_max" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         value="{{ rule.amount_max }}"
                         required />
                     </div>
                     <div>
-                        <label for="score" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ponto(s)</label>
+                        <label for="score" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">$ Cashback </label>
                         <input type="text" id="score" name="score" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         value="{{ rule.score }}"
                         required />

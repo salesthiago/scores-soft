@@ -56,23 +56,7 @@ final class RedemptionRequestController extends AbstractController
                 $this->addFlash('error', 'Recompensa não encontrada');
                 return $this->redirectToRoute('app_redemption_request.create');
             }
-            /*$balanceUser = $scoringService->getUserBalance($user)->toArray();
-            $points = $balanceUser['points'];
-            $minimalPoints = $rewardFounded->getPointsCost();
-
-            if ($points < $minimalPoints) {
-                $this->addFlash('error', 'Desculpe, Você não possui saldo para esta recompensa. Seu saldo é de '.$points. ' pontos');
-                return $this->redirectToRoute('app_show_reward');
-            }
-            $redemption = new RedemptionRequest();
-            $redemption->setStatus('pending');
-            $redemption->setRequestDate(new DateTime('now'));
-            $redemption->setReward($rewardFounded);
-            $redemption->setUser($user);
-
-            $this->entity->persist($redemption);
-            $this->entity->flush();
-            */
+            
             try {
 
                 $redemptionService->createRedemptionRequest($user, $rewardFounded);
@@ -80,10 +64,10 @@ final class RedemptionRequestController extends AbstractController
                 return $this->redirectToRoute('app_redemption_request');
             } catch (Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-                return $this->render('redemption_request/form.html.twig');
+                return $this->redirectToRoute('app_show_reward', ['id' => $data['reward_id']]);
             }
         }
-        return $this->render('redemption_request/form.html.twig');
+        return $this->redirectToRoute('app_rewards');
     }
 
     #[Route('/redemption/request/update/{id}', name: 'app_redemption_request.update')]
@@ -95,11 +79,11 @@ final class RedemptionRequestController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $data = $request->getPayload()->all();
-            $rewardFounded = $this->getRewardById($data['reward_id']);
+            /*$rewardFounded = $this->getRewardById($data['reward_id']);
             if (!$rewardFounded) {
                 $this->addFlash('error', 'Recompensa não encontrada');
                 return $this->redirectToRoute('app_redemption_request.create');
-            }
+            }*/
             $status = '';
             
             switch ($data['status']) {
@@ -124,7 +108,8 @@ final class RedemptionRequestController extends AbstractController
             $this->addFlash('success', 'Requisição atualizada para '. $status);
             return $this->redirectToRoute('app_redemption_request');
         }
-        return $this->render('redemption_request/form.html.twig');
+        // return $this->render('redemption_request/.html.twig');
+        return $this->redirectToRoute('app_rewards');
     }
 
     #[Route('/redemption/request/destroy/{id}', name: 'app_redemption_request.destroy', methods: ['DELETE'])]

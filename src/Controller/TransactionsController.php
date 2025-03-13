@@ -27,19 +27,56 @@ final class TransactionsController extends AbstractController
     #[Route('/transactions', name: 'app_transactions')]
     public function index(Request $request): Response
     {
-        $filters = []; #$request->query->get('filters', []);
         $page = $request->query->get('page', 1);
-        $perPage = $request->query->get('page', 15);
+        $rowsPerPage = $request->query->get('rowsPerPage', 10);
+        $search = $request->query->get('search', null);
+        $offset = ($page - 1) * $rowsPerPage;
 
-        $transactions = $this->find($filters, $page, $perPage);
+        $repository = $this->entity->getRepository(Transactions::class);
+        $queryBuilder = $repository->createQueryBuilder('t')
+            ->leftJoin('t.user', 'u') // Adicionando JOIN com a entidade User
+            ->orderBy('t.id', 'DESC');
+
+        if ($search) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like('u.name', ':search'),
+                    $queryBuilder->expr()->like('u.phone', ':search')
+                )
+            )
+            ->setParameter('search', '%' . $search . '%');
+        }
+
+        // Contagem total corrigida para incluir o JOIN
+        $countQueryBuilder = clone $queryBuilder;
+        $countQueryBuilder->select('COUNT(t.id)')
+            ->resetDQLPart('orderBy');
+
+        $totalUsers = $countQueryBuilder->getQuery()->getSingleScalarResult();
+        $query = $queryBuilder->getQuery()
+            ->setFirstResult($offset)
+            ->setMaxResults($rowsPerPage);
 
         $response = [];
-        foreach($transactions as $item) {
-            $response[] = $item->toArray();
 
+        foreach($query->getResult() as $item) {
+            $response[] = $item->toArray();
         }
+
+        // Contagem total de registros para paginação (considerando a busca)
+        $countQueryBuilder = clone $queryBuilder;
+        $countQueryBuilder->select('COUNT(t.id)')
+            ->resetDQLPart('orderBy');
+        $totalUsers = $countQueryBuilder->getQuery()->getSingleScalarResult();
+
+        $totalPages = ceil($totalUsers / $rowsPerPage);
         return $this->render('transactions/index.html.twig', [
             'transactions' => $response,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'rowsPerPage' => $rowsPerPage,
+            'totalUsers' => $totalUsers,
+            'search' => $search
         ]);
     }
     #[Route('/transactions/new', name: 'app_transactions.create')]

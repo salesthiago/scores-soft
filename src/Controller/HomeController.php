@@ -17,6 +17,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class HomeController extends AbstractController
 {
@@ -25,16 +26,26 @@ final class HomeController extends AbstractController
     {
         $this->entity = $manager;
     }
-    #[Route('/home', name: 'app_home')]
-    public function index(AuthorizationCheckerInterface $authChecker): Response
+    #[Route('/', name: 'app_home')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function index(): Response
     {
         $user = $this->getUser();
+
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
-        ]);
+        return $this->render('home/index.html.twig');
+    }
+    #[Route('/home', name: 'app_home.home')]
+    public function home(AuthorizationCheckerInterface $authChecker): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+        return $this->render('home/index.html.twig');
     }
     #[Route('/scores', name: 'app_my_scores')]
     public function myScore(ScoringService $scoringService): Response

@@ -58,7 +58,7 @@ final class AuthController extends AbstractController
                 return $this->redirectToRoute('app_register');
             }
 
-            if (!$this->validatePhone($phone)) {
+            if ($this->validatePhone($phone) > 0) {
                 $this->addFlash('error', 'Este número já está cadastrado.');
                 return $this->redirectToRoute('app_register');
             }
@@ -84,10 +84,8 @@ final class AuthController extends AbstractController
 
     private function validatePhone($phone)
     {
-        $user = $this->entity->getRepository(User::class)->findOneBy(['phone' => $phone]);
-        if ($user) {
-            return false;
-        }
-        return true;
+        return $this->entity->getRepository(User::class)
+            ->findOneBy(['phone' => $phone])
+            ->count();
     }
 }

@@ -147,7 +147,7 @@ final class TransactionsController extends AbstractController
         return $this->render('transactions/create.html.twig', []);
     }
 
-    #[Route('/transactions/{id}/destroy', name: 'app_transactions.destroy', methods: ['delete'])]
+    #[Route('/transactions/{id}/destroy', name: 'app_transactions.destroy')]
     public function destroy(#[MapEntity(id: 'id')] Transactions $transaction): Response
     {
         $this->entity->remove($transaction);

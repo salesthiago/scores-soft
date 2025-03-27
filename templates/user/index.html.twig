@@ -4,87 +4,172 @@
 
 {% block body %}
 <div class="container mx-auto px-4 py-6">
-    <div class="my-2 py-3">
-        <form action="{{ path('app_user') }}" method="get">
-        <input type="hidden" name="_token" value="{{ csrf_token('profile-form') }}">
-            <label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Pesquisar</label>
-            <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                    </svg>
-                </div>
-                <input type="search" name="search" id="search"
-                class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Nome ou telefone ..." required />
-                <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
-            </div>
-        </form>
-    </div>
-    <div class="my-2 py-3">
-        <a href="/users"
-                class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-600 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800">
-            Limpar Pesquisa
-        </a>
-        <a href="/users/create"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-            Novo Usuário
-        </a>
-    </div>
 
     <div class="py-3 space-y-6">
+        {% for message in app.flashes('error') %}
+            <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="bg-green-100 text-green-700 p-3 rounded-lg mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
         <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
-            <!-- Cabeçalho da tabela -->
-            <div class="bg-gray-50 dark:bg-gray-700 p-4">
-                <div class="grid grid-cols-4 gap-1">
-                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Nome</div>
-                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Telefone</div>
-                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Permissao</div>
-                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">#</div>
+            <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+                    <div class="w-full md:w-1/2">
+                        <form action="{{ path('app_user') }}" method="get" >
+                                <input type="hidden" name="_token" value="{{ csrf_token('profile-form') }}">
+                    <label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Pesquisar</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                            </svg>
+                        </div>
+                        <input type="search" name="search" id="search"
+                        class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Nome ou telefone ..." required />
+                        <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+                    </div>
+                    </form>
+                </div>
+                <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+                    <a href="/users/create"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                        Novo Usuário
+                    </a>
+                    <a href="/users"
+                        class="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-600 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800">
+                            Limpar Pesquisa
+                    </a>
                 </div>
             </div>
-
-            <!-- Conteúdo da tabela -->
-            {% if users is empty %}
-                <div class="p-6 text-center text-gray-500 dark:text-gray-400">
-                    Nenhum usuário cadastrado.
-                </div>
-            {% else %}
-            
-                {% for user in users %}
-                    <div class="flex flex-row items-center gap-8 p-6 sm:items-start lg:items-center">
-                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
-                            {{ user.name }}
-                        </div>
-                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
-                            {{ user.phone }}
-                        </div>
-                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
-                            {{ 'ROLE_ADMIN' in user.roles ? 'Administrador' : 'Cliente' }}
-                        </div>
-                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
-                            <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline" href="{{ path('app_user.update', { 'id': user.id }) }}">
-                                Editar
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-4 py-3">Nome</th>
+                            <th scope="col" class="px-4 py-3">Telefone</th>
+                            <th scope="col" class="px-4 py-3">Permissão</th>
+                            <th scope="col" class="px-4 py-3">Status</th>
+                            <th scope="col" class="px-4 py-3">
+                                <span class="sr-only">Actions</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if users is empty %}
+                        <tr class="border-b dark:border-gray-700">
+                            <td class="p-6 text-center text-gray-500 dark:text-gray-400">
+                                Nenhum usuário cadastrado.
+                            </td>
+                        </tr>
+                    {% else %}
+                        {% for user in users %}
+                            <tr class="border-b dark:border-gray-700">
+                                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ user.name }}</th>
+                                <td class="px-4 py-3">{{ user.phone }}</td>
+                                <td class="px-4 py-3">{{ 'ROLE_ADMIN' in user.roles ? 'Administrador' : 'Cliente' }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="{{ user.status == 1 ? 'bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-red-900 dark:text-red-300' }}">
+                                        {{ user.status == 1 ? 'Ativo' : 'Deletado' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 flex items-center justify-end">
+                                    <a href="/user/{{ user.id }}/update" class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">Editar </a>
+                                {% if user.status == 1 %}
+                                    <button onclick="openDeleteModal('{{ user.id }}')" type="button" class="font-medium text-red-600 dark:text-red-500 hover:underline">
+                                    Deletar
+                                    </button>
+                                {% else %}
+                                    <button onclick="openDeleteModal('{{ user.id }}')" type="button" class="font-medium text-green-600 dark:text-green-500 hover:underline">
+                                    Reativar
+                                    </button>
+                                {% endif %}      
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+                <nav class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
+                    <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        Total de usuários 
+                        <span class="font-semibold text-gray-900 dark:text-white"> {{ totalUsers }}</span>
+                    </span>
+                    <ul class="inline-flex items-stretch -space-x-px">
+                        {% for page in range(1, totalPages) %}
+                        <li>
+                            <a href="{{ path('app_user', { page: page, search: search, status: status }) }}" 
+                            class="flex items-center justify-center px-3 h-8 leading-tight {% if page == currentPage %}text-white bg-blue-600 border-blue-600{% else %}text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white{% endif %}">
+                                {{ page }}
                             </a>
-                            <form action="{{ path('app_user.destroy', {'id': user.id }) }}" method="delete" onsubmit="return confirmDelete(this)">
-                                <button type="submit" class="font-medium text-red-600 dark:text-red-500 hover:underline">
-                                Deletar
-                                </button>
-                            </form>
-                            
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
-<script>
-function confirmDelete(form) {
-    if (confirm("Realmente deseja apagar este usuario? Esta ação não poderá ser revertida.")) {
-        return true;
-    }
-    return false;
-    }
-</script>
+
+<!-- Modal para confirmar exclusão -->
+<div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Confirmar Exclusão</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-300">Digite sua senha para confirmar a exclusão:</p>
+        <input type="password" id="userPassword" class="w-full p-2 mt-2 border rounded-lg dark:bg-gray-700 dark:text-white">
+        <div class="mt-4 flex justify-end">
+            <button onclick="closeDeleteModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancelar</button>
+            <button onclick="confirmDelete()" class="bg-red-600 text-white px-4 py-2 rounded-lg ml-2">Confirmar</button>
+        </div>
+        <form id="deleteForm" method="post" class="hidden">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete-user') }}">
+            <input type="hidden" name="password" id="formPassword">
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        let userIdToDelete = null;
+        
+        function toggleStatus() {
+            console.log('mudando status...')
+            const toggle = document.getElementById('toggleDeleted');
+            const status = toggle.checked ? 0 : 1; // 0 para deletados, 1 para ativos
+            document.getElementById('statusInput').value = status;
+            console.log('status', status)
+            document.forms[0].submit();
+        }
+
+        function openDeleteModal(userId) {
+            userIdToDelete = userId;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            userIdToDelete = null;
+        }
+
+        function confirmDelete() {
+            const password = document.getElementById('userPassword').value;
+            if (!password) {
+                alert("Por favor, digite sua senha.");
+                return;
+            }
+
+            const form = document.getElementById('deleteForm');
+            form.method = 'POST'
+            form.action = `/user/${userIdToDelete}/destroy`;
+            document.getElementById('formPassword').value = password;
+            form.submit();
+        }
+    </script>
 {% endblock %}

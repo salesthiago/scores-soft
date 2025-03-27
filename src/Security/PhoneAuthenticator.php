@@ -65,6 +65,10 @@ class PhoneAuthenticator extends AbstractAuthenticator
             throw new CustomUserMessageAuthenticationException('Usuário não encontrado.');
         }
 
+        if ($user->getStatus() === 0) {
+            throw new CustomUserMessageAuthenticationException("Usuário Inativado");
+        }
+
         return $user;
     }
 

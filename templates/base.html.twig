@@ -11,8 +11,44 @@
     <body>
         {% block body %}{% endblock %}
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
             {{ encore_entry_script_tags('app') }}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const passwordInput = document.getElementById('password');
+                    const togglePasswordButton = document.getElementById('togglePassword');
+                    const lockClosedIcon = document.getElementById('lockClosed');
+                    const lockOpenIcon = document.getElementById('lockOpen');
+                    const phoneInput = document.getElementById('phone');
+
+                    // Alternar visibilidade da senha e ícones
+                    togglePasswordButton.addEventListener('click', function() {
+                        const isPasswordHidden = passwordInput.type === 'password';
+                        passwordInput.type = isPasswordHidden ? 'text' : 'password';
+                        lockClosedIcon.classList.toggle('hidden', !isPasswordHidden);
+                        lockOpenIcon.classList.toggle('hidden', isPasswordHidden);
+                    });
+
+                    // Aplicar máscara ao campo de telefone usando requestAnimationFrame para não interferir com outros eventos
+                    phoneInput.addEventListener('input', function(e) {
+                        requestAnimationFrame(() => {
+                            let phone = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+
+                            if (phone.length > 11) phone = phone.slice(0, 11); // Limita a 11 dígitos
+
+                            // Formata o número para (99) 99999-9999
+                            if (phone.length > 6) {
+                                phone = `(${phone.slice(0, 2)}) ${phone.slice(2, 7)}-${phone.slice(7)}`;
+                            } else if (phone.length > 2) {
+                                phone = `(${phone.slice(0, 2)}) ${phone.slice(2)}`;
+                            } else if (phone.length > 0) {
+                                phone = `(${phone}`;
+                            }
+
+                            e.target.value = phone; // Atualiza o valor do campo
+                        });
+                    });
+                });
+            </script>
         {% endblock %}
     </body>
 </html>

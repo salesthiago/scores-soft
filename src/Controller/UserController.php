@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 final class UserController extends AbstractController
 {
@@ -28,6 +29,7 @@ final class UserController extends AbstractController
         $page = $request->query->get('page', 1);
         $rowsPerPage = $request->query->get('rowsPerPage', 10);
         $search = $request->query->get('search', null);
+        $status = $request->query->get('status', 1);
 
         try {
 
@@ -35,7 +37,7 @@ final class UserController extends AbstractController
 
             $repository = $this->entity->getRepository(User::class);
             $queryBuilder = $repository->createQueryBuilder('u')
-                ->where('u.status = 1')
+                //->where('u.status = '. (int)$status)
                 ->orderBy('u.id', 'DESC');
 
             // Adicionando condições de busca se houver um termo de pesquisa
@@ -69,7 +71,8 @@ final class UserController extends AbstractController
                 'totalUsers' => $totalUsers,
                 'page' => $page,
                 'totalPages' => $totalPages,
-                'search' => $search
+                'search' => $search,
+                'status' => $status
             ]);
 
             return $this->render('user/index.html.twig', [
@@ -78,7 +81,8 @@ final class UserController extends AbstractController
                 'totalPages' => $totalPages,
                 'rowsPerPage' => $rowsPerPage,
                 'totalUsers' => $totalUsers,
-                'search' => $search
+                'search' => $search,
+                'status' => $status
             ]);
         } catch (\Exception $e) {
             $this->logger->error('Erro ao buscar usuários', [
@@ -86,11 +90,14 @@ final class UserController extends AbstractController
                 'trace' => $e->getTraceAsString(),
                 'search' => $search
             ]);
-
-            // Retorna uma resposta amigável de erro
-            return $this->render('error/custom_error.html.twig', [
-                'error_message' => 'Ocorreu um erro ao carregar a lista de usuários. Por favor, tente novamente mais tarde.',
-                'debug' => $this->getParameter('kernel.debug') ? $e->getMessage() : null
+            $this->addFlash('error', $e->getMessage());
+            return $this->render('user/index.html.twig', [
+                    'users' => [],
+                    'currentPage' => 1,
+                    'totalPages' => 0,
+                    'rowsPerPage' => 0,
+                    'totalUsers' => 0,
+                    'search' => null
             ]);
         }
     }
@@ -160,14 +167,30 @@ final class UserController extends AbstractController
         ]);
     }
     #[Route('/user/{id}/destroy', name: 'app_user.destroy')]
-    public function destroy(#[MapEntity(id: 'id')] User $user): Response {
+    public function destroy(#[MapEntity(id: 'id')] User $user,
+            Request $request,
+            UserPasswordHasherInterface $passwordHasher,
+            UserInterface $currentUser
+        ): Response {
 
-        $user->setStatus(0);
+            $password = $request->request->get('password');
+        
+        if (!$passwordHasher->isPasswordValid($currentUser, $password)) {
+            $this->addFlash('error', 'Senha incorreta!');
+            return $this->redirectToRoute('app_user');
+        }
 
+        if ($user->getStatus() === 1) {
+            
+            $user->setStatus(0);
+        } else {
+            $user->setStatus(1);
+        }
+        
         $this->entity->persist($user);
         $this->entity->flush();
 
-        $this->addFlash('success', 'Usuário desativado com sucesso !!');
+        $this->addFlash('success', 'Usuário atualizado com sucesso !!');
         return $this->redirectToRoute('app_user');
     }
 }

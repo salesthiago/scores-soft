@@ -85,7 +85,6 @@ final class AuthController extends AbstractController
     private function validatePhone($phone)
     {
         return $this->entity->getRepository(User::class)
-            ->findOneBy(['phone' => $phone])
-            ->count();
+            ->count(['phone' => $phone]);
     }
 }

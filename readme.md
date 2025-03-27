@@ -53,6 +53,17 @@ Siga os passos abaixo para configurar o ambiente e rodar o projeto:
    ```bash
    npm run prod
    ```
+3. Observações:
+   Sempre que fizer o deploy da aplicação, rode os comandos para limpar o cache
+   ```bash
+   php bin/console cache:clear --env=prod
+   php bin/console cache:warmup --env=prod
+
+   ```
+   e rode este comando para recriar um novo cache:
+   ```bash
+   composer dump-autoload
+   ```
 
 ---
 

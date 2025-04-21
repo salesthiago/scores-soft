@@ -5,6 +5,8 @@ use App\Entity\User;
 use App\Entity\UserBalance;
 use App\Entity\RedemptionRequest;
 use App\Entity\Reward;
+use App\Entity\Settings;
+use App\Entity\Transactions;
 use App\Exception\InsufficientPointsException;
 use App\Exception\InvalidRewardException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,10 +42,18 @@ class RedemptionService
         // Obtém o saldo atual do usuário
         $userBalance = $this->scoringService->getUserBalance($user);
 
+        $settings = $this->entityManager->getRepository(Settings::class)->findOneBy(['name' => 'max_buys']);
+        $maxBuys = $settings ? $settings->getValue() : 10;
+        $myBuys = $this->entityManager->getRepository(Transactions::class)->count(['user' => $user, 'is_consumed' => 0]);
+
+        if ($myBuys < $maxBuys) {
+            throw new Exception('Para solicitar um resgate, você precisa ter pelo menos '. $maxBuys .' compras.');
+        }
+        
         // Verifica se o usuário tem pontos suficientes
         if ($userBalance->getPoints() < $reward->getPointsCost()) {
             throw new Exception(
-                'Pontos insuficientes para este resgate.'
+                'Pontos insuficientes para este resgate. Saldo atual é de '. $userBalance->getPoints()
             );
         }
 
@@ -109,5 +119,21 @@ class RedemptionService
                 ['user' => $user],
                 ['requestDate' => 'DESC']
             );
+    }
+
+    public function countPendingRedemptions(User $user): int
+    {
+        return $this->entityManager
+            ->getRepository(Transactions::class)
+            ->count([
+                'user' => $user,
+                'is_consumed' => 0
+            ]);
+    }
+    public function getRedemptionRequestById(int $id): ?RedemptionRequest
+    {
+        return $this->entityManager
+            ->getRepository(RedemptionRequest::class)
+            ->find($id);
     }
 }

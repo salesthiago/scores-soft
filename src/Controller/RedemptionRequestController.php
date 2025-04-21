@@ -30,8 +30,9 @@ final class RedemptionRequestController extends AbstractController
         $user = $this->getUser();
         $filter =  ['status' => $request->query->get('status', 'pending')];
         // SE NAO FOR ADMIN, FILTRA PELO USUARIO PARA VER SOMENTE AS SUAS REQUISIÇÕES.
-        if (array_search('ROLE_USER', $user->getRoles(), true)) {
-            $filter['user_id'] = $user->getId();
+        $isAdmin = array_search('ROLE_ADMIN', $user->getRoles(), true) ? true : false;
+        if (!$isAdmin) {
+            $filter['user'] = $user;
         }
         $redemptions = $this->entity->getRepository(RedemptionRequest::class)
             ->findBy($filter);
@@ -112,19 +113,24 @@ final class RedemptionRequestController extends AbstractController
         return $this->redirectToRoute('app_rewards');
     }
 
-    #[Route('/redemption/request/destroy/{id}', name: 'app_redemption_request.destroy', methods: ['DELETE'])]
-    public function destroy(#[MapEntity(id: 'id')] RedemptionRequest $redemption)
+    #[Route('/redemption/request/destroy/{id}', name: 'app_redemption_request.destroy', methods: ['DELETE', 'POST'])]
+    public function destroy(#[MapEntity(id: 'id')] RedemptionRequest $redemption, Request $request)
     {
-        $user = $this->getUser();
-        if ($user !== $redemption->getUser()) {
-            $this->addFlash('error', 'Somente o usuario que solicitou pode remover esta requisição.');
+        $id = $redemption->getId();
+        if ($this->isCsrfTokenValid('delete' . $id, $request->request->get('_token'))) {
+            $user = $this->getUser()->toArray();
+            
+            if (array_search('ROLE_USER', $user['roles'], true) && $user['id'] !== $redemption->getUser()->getId()) {
+                $this->addFlash('error', 'Somente o usuario que solicitou pode remover esta requisição.');
+                return $this->redirectToRoute('app_redemption_request');
+            }
+
+            $this->entity->remove($redemption);
+            $this->entity->flush();
+
             return $this->redirectToRoute('app_redemption_request');
         }
-
-        $this->entity->remove($redemption);
-        $this->entity->flush();
-
-        return $this->redirectToRoute('app_redemption_request');
+        throw new Exception('Token inválido');
     }
 
     private function getRewardById($id)

@@ -7,3 +7,8 @@
 body {
     background-color: lightgray;
 }
+
+.dark body {
+    background-color: #1f2937; /* gray-800 do Tailwind */
+    color: white;
+}

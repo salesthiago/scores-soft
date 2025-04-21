@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Reward;
+use App\Entity\Transactions;
 use App\Entity\User;
 use App\Entity\UserBalance;
+use App\Service\RedemptionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\Logger;
@@ -35,26 +37,34 @@ final class HomeController extends AbstractController
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        return $this->render('home/index.html.twig');
+        //return $this->render('home/index.html.twig');
+        return $this->redirectToRoute('app_home.home');
     }
     #[Route('/home', name: 'app_home.home')]
-    public function home(AuthorizationCheckerInterface $authChecker): Response
+    public function home(?RedemptionService $redemption): Response
     {
         $user = $this->getUser();
-
+        $rewards = 0;
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        return $this->render('home/index.html.twig');
+        if ($redemption) {
+            $rewards = $redemption->countPendingRedemptions($user);
+        }
+
+        return $this->render('home/index.html.twig', ['rewards' => $rewards]);
     }
     #[Route('/scores', name: 'app_my_scores')]
     public function myScore(ScoringService $scoringService): Response
     {
         $user = $this->getUser();
         $scores = $scoringService->getUserBalance($user)->toArray();
+        $quantity = $this->entity->getRepository(Transactions::class)
+            ->count(['user' => $user, 'is_consumed' => 0]);
         return $this->render('home/my-score.html.twig', [
             'scores' => $scores,
-        ]);
+            'quantity' => $quantity
+        ]); 
     }
 
     #[Route('/history', name: 'app_my_history')]

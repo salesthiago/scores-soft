@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Settings;
 use App\Entity\Transactions;
 use App\Entity\User;
 use App\Repository\TransactionsRepository;
+use App\Service\RedemptionService;
 use App\Service\ScoringService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -80,7 +82,7 @@ final class TransactionsController extends AbstractController
         ]);
     }
     #[Route('/transactions/new', name: 'app_transactions.create')]
-    public function create(ScoringService $scoringService, Request $request): Response
+    public function create(?RedemptionService $redemption, ScoringService $scoringService, Request $request): Response
     {
         if ($request->isMethod('post')) {
             $data = $request->getPayload()->all();
@@ -101,8 +103,16 @@ final class TransactionsController extends AbstractController
                 $this->addFlash('error', 'Usuário inválido');
                 return $this->redirectToRoute('app_transactions.create', ['transaction' => $data]);
             }
-            try {
 
+            try {
+                if ($redemption) {
+                    $rewards = $redemption->countPendingRedemptions($user);
+                    $limit = $this->getLimitTransaction();
+                    if ($rewards >= $limit) {
+                        $this->addFlash('error', 'Este usuário já possui '. $limit .' compras, oriente-o a solicitar o resgate');
+                        return $this->redirectToRoute('app_transactions.create', ['transaction' => $data]);
+                    }
+                }
                 $data['amount'] = (float)str_replace(',', '.', $data['amount']);
                 $transaction = new Transactions();
                 $transaction->setUser($user);
@@ -163,5 +173,14 @@ final class TransactionsController extends AbstractController
             ->findBy($filter, null, $perPage, $page);
         */
         return $this->entity->getRepository(Transactions::class)->findAll();
+    }
+
+    protected function getLimitTransaction()
+    {
+        $limit = $this->entity->getRepository(Settings::class)->findOneBy(['name' => 'max_buys']);
+        if ($limit) {
+            return $limit->getValue();
+        }
+        return 10;
     }
 }

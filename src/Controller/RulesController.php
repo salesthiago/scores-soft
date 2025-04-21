@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Rule;
+use App\Entity\Settings;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -81,5 +82,36 @@ final class RulesController extends AbstractController
         
         $this->addFlash('success', 'Deletetado com sucesso!');
         return $this->redirectToRoute('app_rules');
+    }
+
+    #[Route('/rules-settings', name: 'app_rules.settings')]
+    public function settings(Request $request): Response
+    {
+        $limit = $this->entity->getRepository(Settings::class)->findOneBy(['name' => 'max_buys']);
+        if ($request->isMethod('POST')) {
+            $data = $request->getPayload()->all();
+            if (empty($data['max_buys'])) {
+                $this->addFlash('error', 'Informe o limite de compras');
+                return $this->render('rules/settings.html.twig', [
+                    'limit' => $limit ? $limit->getValue() : 0
+                ]);
+            }
+            if (!$limit) {
+                $setting = new Settings();
+                $setting->setName('max_buys');
+            }
+            
+            $setting->setValue($data['max_buys']);
+            $this->entity->persist($setting);
+            $this->entity->flush();
+
+            $this->addFlash('success', 'Atualizado com sucesso!');
+            return $this->redirectToRoute('app_rules');
+        }
+
+        return $this->render('rules/settings.html.twig', [
+            'limit' => $limit ? $limit->getValue() : 0
+        ]);
+
     }
 }

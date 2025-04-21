@@ -83,7 +83,7 @@ class UserBalance
     public function reservePoints(int $points): self
     {
         if ($this->getAvailablePoints() < $points) {
-            throw new InsufficientPointsException(
+            throw new Exception(
                 'Saldo insuficiente para reserva. Disponível: ' . 
                 $this->getAvailablePoints() . 
                 ', Solicitado: ' . $points
@@ -133,7 +133,8 @@ class UserBalance
             'points' => $this->getPoints(),
             'reserved_points' => $this->getReservedPoints(),
             'available_points' => $this->getAvailablePoints(),
-            'remaining_value' => $this->getRemainingValue()
+            'remaining_value' => $this->getRemainingValue(),
         ];
     }
+    
 }

@@ -122,6 +122,7 @@ class Transactions
                 'name' => $this->creator->getName(),
                 'phone' => $this->user->getPhone()
             ] : null,
+            'is_consumed' => $this->is_consumed,
             'amount' => $this->amount,
             'order_number' => $this->order_number,
             'created_at' => date_format(date_create($this->created_at), 'd/m/Y H:i:s')

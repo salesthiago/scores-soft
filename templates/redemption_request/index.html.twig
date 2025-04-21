@@ -18,8 +18,9 @@
     <div class="space-y-6">
         <div class="divide-y divide-gray-200 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
             <!-- Cabeçalho da tabela -->
-            <div class="bg-gray-50 dark:bg-gray-700 p-4">
-                <div class="grid grid-cols-4 gap-1">
+            <div class="bg-gray-50 dark:bg-gray-700 p-6">
+                <div class="grid grid-cols-5 gap-1">
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Nome</div>
                     <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Recompensa</div>
                     <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Status</div>
                     <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Data</div>
@@ -34,7 +35,10 @@
                 </div>
             {% else %}
                 {% for item in items %}
-                    <div class="flex flex-row items-center gap-8 p-6 sm:items-start lg:items-center">
+                    <div class="flex flex-row items-center gap-1 p-6 sm:items-start lg:items-center">
+                        <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
+                            {{ item.user.name }}
+                        </div>
                         <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
                             {{ item.reward.name }}
                         </div>
@@ -45,7 +49,9 @@
                             {{ item.requestDate }}
                         </div>
                         <div class="text-sm text-gray-900 dark:text-gray-100 flex-col w-full">
-                            <form action="{{ path('app_redemption_request.destroy', {'id': item.id }) }}" method="delete" onsubmit="return confirmDelete(this)">
+                            <form action="{{ path('app_redemption_request.destroy', {'id': item.id }) }}" method="post" onsubmit="return confirmDelete(this)">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
                                 <button type="submit" class="font-medium text-red-600 dark:text-red-500 hover:underline">
                                     Deletar
                                 </button>

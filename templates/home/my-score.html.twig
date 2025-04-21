@@ -1,6 +1,6 @@
 {% extends 'auth.html.twig' %}
 
-{% block title %}Meus Pontos!{% endblock %}
+{% block title %}Meu Cashback!{% endblock %}
 
 {% block body %}
 
@@ -11,7 +11,7 @@
             <section class="bg-white dark:bg-gray-900">
                 <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
                     <div class="max-w-screen-md mb-8 lg:mb-16">
-                        <p class="text-center text-gray-500 sm:text-xl dark:text-gray-400">Meus Pontos</p>
+                        <p class="text-center text-gray-500 sm:text-xl dark:text-gray-400">Meu Cashback</p>
                         <h2 class=" text-center mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">{{ scores.points }}</h2>
                     </div>
                 </div>
@@ -24,8 +24,15 @@
                     </div>
                 </div>
             </section>
+            <section class="bg-white dark:bg-gray-900">
+                <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
+                    <div class="max-w-screen-md mb-8 lg:mb-16">
+                        <p class="text-center text-gray-500 sm:text-xl dark:text-gray-400"> Quantidade Compras</p>
+                        <h2 class="text-center mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">{{ quantity }}</h2>
+                    </div>
+                </div>
+            </section>
         </div>
-        
     </div>
 </div>
 {% endblock %}
